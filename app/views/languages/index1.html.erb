@@ -1,0 +1,93 @@
+<script src='http://localhost:7777/socket.io/socket.io.js'></script>
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script>
+var php_count = 1;
+var js_count = 1;
+var ruby_count = 1;
+	// <% @languages.each do |language| %>
+	// <% end %>
+	// console.log(<%= @languages%>)
+
+	var io = io.connect("http://localhost:7777", {force_connection: true});
+  	$(document).ready(function(){
+   		$('.update_language').submit(function(){
+      		$.post(
+        		$(this).attr('action'),
+        		$(this).serialize(),
+        		function(data){
+          			console.log('HELLO');
+          			js_count += 1
+          			// console.log('Data', data.name);
+
+          			// $('#products').append("<tr><td>" + data.name + "</td><td>" + data.description + "</td></tr>");
+        		}
+      		);
+      	return false;
+    	});
+
+    	io.on('info', function(data){
+    		console.log("THIS IS THE DATA", data)
+    		console.log("THIS IS THE DATA-language", data.language)
+    		// console.log("THIS IS THE DATA[name]", data.msg.name)
+    		if(data.language == 'JavaScript'){
+    			js_count++
+    			console.log('JS COUNT', js_count)
+    		} else if (data.language == 'PHP'){
+    			php_count++
+    		} else{
+    			ruby_count++
+    		}
+    		// console.log("THIS IS THE DATA[name]", data.name)
+    		// $('#products').append("<tr><td>" + data.name + "</td><td>" + data.description + "</td></tr>");
+    	})
+	    var options = {
+		    chart: {
+		        renderTo: 'container',
+		        defaultSeriesType: 'spline'
+		    },
+		    series: []
+		};
+
+	$("#change").click(function() {
+	    if ($("#list").val() == "A") {
+	        options.series = [{name: 'A', data: [1,2,3,2,1]}]
+	        // $.get('/dough/includes/live-chart.php?mode=month'
+	    } else {
+	        options.series = [{name: 'B', data: [3,2,1,2,3]}]
+	        // $.get('/dough/includes/live-chart.php?mode=newmode'
+	    } 
+
+	    var chart = new Highcharts.Chart(options);    
+	});
+});
+
+
+</script>
+<h1>High Chart</h1>
+<div id="container" style="width:100%; height:400px;"></div>
+<SELECT id="list">
+<OPTION VALUE="A">Data Set A
+<OPTION VALUE="B">Data Set B
+</SELECT>
+<button id="change">Refresh Table</button>
+
+<!-- <div id="container" style="height: 400px"></div>
+<form class='update_language' method='post' action='languages/update'>
+	<input type='hidden' name='_method' value='put'/>
+	<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'/>
+	<input type='hidden' name='language' value='JavaScript'/>
+	<input type='submit' value='JavaScript'/>
+</form>
+<form class='update_language' method='post' action='languages/update'>
+	<input type='hidden' name='_method' value='put'/>
+	<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'/>
+	<input type='hidden' name='language' value='Ruby'/>
+	<input type='submit' value='Ruby'/>
+</form>
+<form class='update_language' method='post' action='languages/update'>
+	<input type='hidden' name='_method' value='put'/>
+	<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'/>
+	<input type='hidden' name='language' value='PHP'/>
+	<input type='submit' value='PHP'/>
+</form> -->

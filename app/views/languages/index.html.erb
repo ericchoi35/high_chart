@@ -1,0 +1,97 @@
+<script src='http://localhost:7777/socket.io/socket.io.js'></script>
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> -->
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script>
+var php_count = <%= @languages[0].count %>;
+var ruby_count = <%= @languages[1].count %>;
+var js_count = <%= @languages[2].count %>;
+
+var io = io.connect("http://localhost:7777/", {force_connection: true});
+
+	$(document).ready(function(){
+		$('.update_language').submit(function(){
+	  		$.post(
+	    		$(this).attr('action'),
+	    		$(this).serialize(),
+	    		function(data){
+	      			console.log('HELLO');
+	    		}
+	  		);
+  			return false;
+		});
+
+	io.on('info', function(data){
+		if(data.language == 'JavaScript'){
+			js_count++
+			console.log('JS COUNT', js_count)
+		} else if (data.language == 'PHP'){
+			php_count++
+		} else{
+			ruby_count++
+		}
+		$(function () {
+		    $('#container').highcharts({
+		        chart: {
+		            plotBackgroundColor: null,
+		            plotBorderWidth: 1,//null,
+		            plotShadow: true
+		        },
+		        title: {
+		            text: 'Favorite Languages'
+		        },
+		        series: [{
+		            type: 'pie',
+		            name: 'Language Popularity',
+		            data: [
+		            	['PHP', php_count],
+		            	['JavaScript', js_count],
+		            	['Ruby', ruby_count],
+		            ],
+		        }]
+		    });
+		});
+	})
+ //    $(function () {
+	//     $('#container').highcharts({
+	//         chart: {
+	//             plotBackgroundColor: null,
+	//             plotBorderWidth: 1,//null,
+	//             plotShadow: false
+	//         },
+	//         title: {
+	//             text: 'Favorite Languages'
+	//         },
+	//         series: [{
+	//             type: 'pie',
+	//             name: 'Language Popularity',
+	//             data: [
+	//             	['PHP', php_count],
+	//             	['JavaScript', js_count],
+	//             	['Ruby', ruby_count],
+	//             ],
+	//         }]
+	//     });
+	// });
+});
+</script>
+
+<h1>High Chart</h1>
+<div id="container" style="width:100%; height:400px;"></div>
+<form class='update_language' method='post' action='languages/update'>
+	<!-- <input type='hidden' name='_method' value='put'/> -->
+	<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'/>
+	<input type='hidden' name='language' value='JavaScript'/>
+	<input type='submit' value='JavaScript'/>
+</form>
+<form class='update_language' method='post' action='languages/update'>
+	<!-- <input type='hidden' name='_method' value='put'/> -->
+	<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'/>
+	<input type='hidden' name='language' value='Ruby'/>
+	<input type='submit' value='Ruby'/>
+</form>
+<form class='update_language' method='post' action='languages/update'>
+	<!-- <input type='hidden' name='_method' value='put'/> -->
+	<input type='hidden' name='authenticity_token' value='<%= form_authenticity_token %>'/>
+	<input type='hidden' name='language' value='PHP'/>
+	<input type='submit' value='PHP'/>
+</form>
